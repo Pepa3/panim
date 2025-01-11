@@ -44,7 +44,7 @@ bool build_plug_c3(bool force, Nob_Cmd *cmd, const char *output_path, const char
         // otherwise this is not buildable
         nob_cmd_append(cmd, "c3c", "dynamic-lib", "-o", output_path);
         nob_da_append_many(cmd, source_paths, source_paths_count);
-        if (!nob_cmd_run_sync_and_reset(cmd)) return false;
+        if (!nob_cmd_run_sync_and_reset(cmd)) return true;
     }
 
     return true;
@@ -128,6 +128,7 @@ int main(int argc, char **argv)
     if (!build_plug_c(force, &cmd, PLUGS_DIR"template/plug.c", BUILD_DIR"libtemplate.so")) return 1;
     if (!build_plug_c(force, &cmd, PLUGS_DIR"squares/plug.c", BUILD_DIR"libsquare.so")) return 1;
     if (!build_plug_c(force, &cmd, PLUGS_DIR"bezier/plug.c", BUILD_DIR"libbezier.so")) return 1;
+    if (!build_plug_cxx(force, &cmd, PLUGS_DIR"draw/plug.cpp", BUILD_DIR"libdraw.so")) return 1;
     if (!build_plug_cxx(force, &cmd, PLUGS_DIR"cpp/plug.cpp", BUILD_DIR"libcpp.so")) return 1;
     {
         const char *output_path = BUILD_DIR"libc3";
