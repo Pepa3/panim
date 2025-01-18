@@ -161,6 +161,7 @@ typedef struct {
     std::vector<Rectangle> *points;
     std::vector<Texture> *texs;
     bool draw_mode;
+    Texture tex;
     Draw* dr;
 } Plug;
 
@@ -169,11 +170,13 @@ static Plug *p;
 static void load_assets(void)
 {
     p->font = LoadFontEx("./assets/fonts/Vollkorn-Regular.ttf", FONT_SIZE, NULL, 0);
+    p->tex = LoadTexture("/home/pepa3/Documents/pepe-close.png");
 }
 
 static void unload_assets(void)
 {
     UnloadFont(p->font);
+    UnloadTexture(p->tex);
 }
 
 extern "C" {
@@ -192,11 +195,10 @@ void plug_reset(void)
     v.push_back({10.0,10.0});
     v.push_back({10.0,13.0});
     v.push_back({12.0,14.0});
-    Texture tex = LoadTexture("/home/pepa3/Documents/pepe-close.png");
-    if(!p->dr) p->dr = new Draw(p->points, v, 3, 1.f);
+    p->dr = new Draw(p->points, v, 3, 1.f);
     p->task = new Seq {
         new Move_Vec2(&p->position, {200.0, 200.0}, 0.5f),
-        new Draw_Image(p->texs, tex),
+        new Draw_Image(p->texs, p->tex),
         p->dr,
         new Move_Vec2(&p->position, {200.0, 0.0}, 0.5f),
         new Move_Vec2(&p->position, {0.0, 200.0}, 0.5f),
