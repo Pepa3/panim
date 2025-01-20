@@ -9,7 +9,12 @@
 void cflags(Nob_Cmd *cmd)
 {
     nob_cmd_append(cmd, "-Wall", "-Wextra", "-ggdb");
+    #ifndef _WIN32
     nob_cmd_append(cmd, "-I./raylib/raylib-5.0_linux_amd64/include");
+    #else
+    nob_cmd_append(cmd, "-I./raylib/raylib-5.5_win64_mingw-w64/include");
+    nob_cmd_append(cmd, "-I../../ffmpeg-install/include");
+    #endif
     nob_cmd_append(cmd, "-I"PANIM_DIR);
     nob_cmd_append(cmd, "-I.");
 }
@@ -29,10 +34,18 @@ void cxx(Nob_Cmd *cmd)
 
 void libs(Nob_Cmd *cmd)
 {
+    #ifndef _WIN32
     nob_cmd_append(cmd, "-Wl,-rpath=./raylib/raylib-5.0_linux_amd64/lib/");
     nob_cmd_append(cmd, "-Wl,-rpath="PANIM_DIR);
     nob_cmd_append(cmd, "-L./raylib/raylib-5.0_linux_amd64/lib");
     nob_cmd_append(cmd, "-l:libraylib.so", "-lm", "-ldl", "-lpthread");
+    #else
+    nob_cmd_append(cmd, "-Wl,-rpath=./raylib/raylib-5.5_win64_mingw-w64/lib/");
+    nob_cmd_append(cmd, "-Wl,-rpath="PANIM_DIR);
+    nob_cmd_append(cmd, "-L./raylib/raylib-5.5_win64_mingw-w64/lib");
+    nob_cmd_append(cmd, "-L../../ffmpeg-install/bin");
+    nob_cmd_append(cmd, "-l:raylib.dll", "-lm", "-lpthread", "-l:avcodec.lib", "-l:avutil.lib", "-l:avformat.lib", "-l:swresample.lib", "-l:swscale.lib");
+    #endif
 }
 
 bool build_plug_c3(bool force, Nob_Cmd *cmd, const char *output_path, const char **source_paths, size_t source_paths_count)
@@ -146,7 +159,11 @@ int main(int argc, char **argv)
         const char *output_path = BUILD_DIR"panim";
         const char *input_paths[] = {
             PANIM_DIR"panim.c",
+            #ifndef _WIN32
             PANIM_DIR"ffmpeg_linux.c"
+            #else
+            PANIM_DIR"ffmpeg_windows.c"
+            #endif
         };
         size_t input_paths_len = NOB_ARRAY_LEN(input_paths);
         if (!build_exe(force, &cmd, input_paths, input_paths_len, output_path)) return 1;

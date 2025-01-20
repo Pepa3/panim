@@ -170,7 +170,7 @@ static Plug *p;
 static void load_assets(void)
 {
     p->font = LoadFontEx("./assets/fonts/Vollkorn-Regular.ttf", FONT_SIZE, NULL, 0);
-    p->tex = LoadTexture("/home/pepa3/Documents/pepe-close.png");
+    p->tex = LoadTexture("./assets/image2.jpg");
 }
 
 static void unload_assets(void)

@@ -9,3 +9,6 @@ nob.old
 *.aux
 *.log
 *.pdf
+/nob.exe
+/nob.exe.old
+/.vs

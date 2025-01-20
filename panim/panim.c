@@ -4,9 +4,13 @@
 
 #include <raylib.h>
 #include <raymath.h>
-
+#ifndef _WIN32
 #include <dlfcn.h>
-
+#else
+#include <minwindef.h>
+#define dlclose(dll) FreeLibrary(dll)
+#define dlopen(path,_) LoadLibrary(path)
+#endif
 #define NOB_IMPLEMENTATION
 #include "nob.h"
 #include "plug.h"
@@ -54,16 +58,28 @@ static bool reload_libplug(const char *libplug_path)
 
     libplug = dlopen(libplug_path, RTLD_NOW);
     if (libplug == NULL) {
+    #ifndef _WIN32
         fprintf(stderr, "ERROR: %s\n", dlerror());
+    #else
+        fprintf(stderr, "ERROR: %ld\n", GetLastError());
+    #endif
         return false;
     }
-
+#ifndef _WIN32
     #define PLUG(name, ...) \
         name = dlsym(libplug, #name); \
         if (name == NULL) { \
             fprintf(stderr, "ERROR: %s\n", dlerror()); \
             return false; \
         }
+#else
+    #define PLUG(name, ret, par) \
+        name = (ret(*)(par))GetProcAddress(libplug, #name); \
+         if (name == NULL) { \
+            fprintf(stderr, "ERROR: %ld\n", GetLastError()); \
+             return false; \
+         }
+#endif
     LIST_OF_PLUGS
     #undef PLUG
 
